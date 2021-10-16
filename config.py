@@ -58,3 +58,7 @@ LOGGING = {
         },
     }
 }
+
+GAME_SETTINGS = {
+    "resolution": (640, 640)
+}

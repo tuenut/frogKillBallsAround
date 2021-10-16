@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from logging import Logger
 
 from abstarct.app.game import ABCGame
+from abstarct.app.render import ABCRender
 from abstarct.app.state import ABCAppState
 
 
@@ -17,13 +18,18 @@ class ABCApp(ABC):
         Application state
     game : ABCGame
         Game class
-    _playtime : float
+    _run_timer : float
         timer starts from start app
     """
-    logger: Logger = None
 
+    logger: Logger = None
     state: ABCAppState = None
     game: ABCGame = None
+    render: ABCRender = None
+
+    @abstractmethod
+    def __init__(self):
+        ...
 
     @property
     @abstractmethod
