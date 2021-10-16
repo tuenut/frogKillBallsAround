@@ -3,7 +3,7 @@ from typing import Tuple
 
 import pygame  # type: ignore
 
-from app.game.state.controller import Frog, GameStateController
+from app.game.state.controller import Player, GameStateController
 
 
 class FrogRender:

@@ -6,31 +6,25 @@ from app.state import AppState
 from config import GAME_SETTINGS
 
 
-class Frog:
+class Player:
     def __init__(self):
-        self.pos = (
-            math.ceil(GAME_SETTINGS["resolution"][0] / 2),
-            math.ceil(GAME_SETTINGS["resolution"][1] / 2)
-        )
+        self.x = GAME_SETTINGS["resolution"][0]
+        self.y = GAME_SETTINGS["resolution"][1]
 
     @property
-    def vector(self) -> pygame.Vector2:
-        return pygame.Vector2(self.pos)
+    def pos(self):
+        return pygame.Vector2(self.x, self.y) / 2
 
 
 class GameStateController:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-        self.mouse_pos = pygame.mouse.get_pos()
-        self.player = Frog()
+        self.mouse = pygame.Vector2(pygame.mouse.get_pos())
+        self.player = Player()
 
         self.__app_state = AppState()
 
-    @property
-    def vector(self):
-        return pygame.Vector2(self.player.pos), pygame.Vector2(self.mouse_pos)
-
     def update(self):
-        self.mouse_pos = pygame.mouse.get_pos()
-        self.__app_state.title = self.mouse_pos
+        self.mouse = pygame.Vector2(pygame.mouse.get_pos())
+        self.__app_state.title = self.mouse
