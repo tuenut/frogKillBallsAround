@@ -129,3 +129,8 @@ class Gun:
 
     def fire(self, pos):
         self.logger.debug("FIRE!!!!!")
+        self.__shooting_vector.add_bullet_to_vector()
+
+    @property
+    def mouse(self):
+        return self.__shooting_vector.mouse

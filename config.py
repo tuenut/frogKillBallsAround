@@ -59,6 +59,8 @@ LOGGING = {
     }
 }
 
+RENDER_DEBUG = True
+
 GAME_SETTINGS = {
     "resolution": (640, 640)
 }
