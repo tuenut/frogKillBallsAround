@@ -3,7 +3,8 @@ from typing import Tuple
 
 import pygame  # type: ignore
 
-from app.game.state.controller import Player, GameStateController
+from app.game.state.controller import GameStateController
+from app.game.state.player import Player
 
 
 class FrogRender:
@@ -23,8 +24,8 @@ class FrogRender:
     @property
     def pos(self) -> Tuple[float, float]:
         return (
-            self.data.player.pos[0] - self.radius,
-            self.data.player.pos[1] - self.radius
+            self.data.player.vector[0] - self.radius,
+            self.data.player.vector[1] - self.radius
         )
 
     def __draw(self):
