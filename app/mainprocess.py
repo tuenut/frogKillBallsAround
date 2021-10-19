@@ -72,7 +72,7 @@ class App(ABCApp):
         )
 
     def __fps_update(self):
-        self._run_timer += (self._clock.tick(60) / 1000.0)
+        self._run_timer += (self._clock.tick(FPS) / 1000.0)
         # fps = f"FPS: {self._clock.get_fps():.2f} Playtime: {self._run_timer:.2f}"
         # self.state.title = fps
         ...

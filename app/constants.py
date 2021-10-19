@@ -1,4 +1,4 @@
-FPS = 30
+FPS = 60
 
 ALPHA_COLOR = (255, 0, 255)
 COLOR_RENDER_BG = (0, 0, 0)

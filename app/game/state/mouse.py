@@ -5,7 +5,14 @@ from utils.decorators import as_singleton
 
 class MouseDescriptor:
     def __get__(self, instance, owner):
-        return Mouse().pos
+        try:
+            return Mouse().pos
+        except pygame.error as e:
+            # seems to be a problem with initialization order with ABC
+            if "video system not initialized" in e.args:
+                return None
+            else:
+                raise e
 
 
 @as_singleton

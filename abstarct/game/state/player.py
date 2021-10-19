@@ -6,7 +6,7 @@ class ABCShotVector:
     mouse: pygame = None
 
     @abstractmethod
-    def updater(self):
+    def update(self):
         ...
 
     @property

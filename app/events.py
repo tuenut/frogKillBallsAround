@@ -40,7 +40,10 @@ class EventManager:
             if self.check_conditions(event, conditions) \
                     and self.check_event_subtype(event, subtype):
                 kwargs = self.__get_kwargs(event, subscribtion["kwargs"])
-                callback(**kwargs)
+                if subscribtion["as_args"]:
+                    callback(*kwargs.values())
+                else:
+                    callback(**kwargs)
 
     @classmethod
     def check_conditions(cls, event, conditions):
@@ -106,7 +109,8 @@ class EventManager:
             callback,
             subtype: Optional[int] = None,
             conditions: Optional[dict] = None,
-            kwargs: Optional[list] = None
+            kwargs: Optional[list] = None,
+            as_args: bool = False
     ):
         self.logger.debug(
             f"Subscribe callback <{callback}> on event_type <{event_type}>."
@@ -119,7 +123,8 @@ class EventManager:
             "callback": callback,
             "subtype": subtype,
             "conditions": conditions,
-            "kwargs": kwargs
+            "kwargs": kwargs,
+            "as_args": as_args
         }
 
         try:

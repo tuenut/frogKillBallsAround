@@ -6,39 +6,23 @@ from typing import Type
 
 import pygame
 
-from app.events import EventManager
 from abstarct.game.state.player import ABCShotVector
 from app.game.state.mouse import MouseDescriptor
 from config import GAME_SETTINGS
 
 
-class Bullet:
-    def __init__(self, start_pos, vector):
-        self.start_pos = self.pos = pygame.Vector2(start_pos)
-        self.target_vector = vector
-
-    def update(self):
-        # TODO calculate next position from current and target vector
-        ...
-
-
 class ShootingVector(ABCShotVector):
     mouse: pygame.Vector2 = MouseDescriptor()
 
-    def __init__(self, player):
+    def __init__(self, player_position: pygame.Vector2):
         self.x_limit = GAME_SETTINGS["resolution"][0]
         self.y_limit = GAME_SETTINGS["resolution"][1]
-        self.__player = player
-
-        self.fired_bullets = []
+        self.player_position = player_position
 
         self.update()
 
     def update(self):
-        self.mouse = pygame.Vector2(pygame.mouse.get_pos())
         self.__update_shot_vector()
-        for bullet in self.fired_bullets:
-            bullet.update()
 
     def __update_shot_vector(self):
         """
@@ -58,7 +42,7 @@ class ShootingVector(ABCShotVector):
 
         in_top_part = self.mouse.x >= 0 and self.mouse.y <= self.y_limit / 2
 
-        MC = self.mouse.distance_to(self.__player.vector)
+        MC = self.mouse.distance_to(self.player_position)
         MQ = abs(self.x_limit / 2 - self.mouse.x)
         sin_MCQ = MQ / MC
         cos_MCQ = math.sqrt(1 - sin_MCQ ** 2)
@@ -97,10 +81,6 @@ class ShootingVector(ABCShotVector):
     def vector(self):
         return self.__vector
 
-    def add_bullet_to_vector(self):
-        bullet = Bullet((self.x_limit / 2, self.y_limit / 2), self.vector)
-        self.fired_bullets.append(bullet)
-
 
 class GunShootingVectorDEscriptor:
     def __get__(self, instance: Type[Gun], owner=None):
@@ -110,27 +90,10 @@ class GunShootingVectorDEscriptor:
 class Gun:
     vector: pygame.Vector2 = GunShootingVectorDEscriptor()
 
-    def __init__(self, player):
+    def __init__(self, player_position: pygame.Vector2):
         self.logger = logging.getLogger(__name__)
 
-        self.__player = player
-        self.__shooting_vector = ShootingVector(self.__player)
-
-        self.events = EventManager()
-
-        self.events.subscribe(
-            event_type=pygame.MOUSEBUTTONDOWN,
-            callback=self.fire,
-            kwargs=["pos"]
-        )
+        self.__shooting_vector = ShootingVector(player_position)
 
     def update(self):
         self.__shooting_vector.update()
-
-    def fire(self, pos):
-        self.logger.debug("FIRE!!!!!")
-        self.__shooting_vector.add_bullet_to_vector()
-
-    @property
-    def mouse(self):
-        return self.__shooting_vector.mouse

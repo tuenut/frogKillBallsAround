@@ -16,7 +16,7 @@ class Player(ABCPlayer):
         y = y if y is not None else GAME_SETTINGS["resolution"][1] / 2
 
         self.__vector = pygame.Vector2(x, y)
-        self.gun = Gun(self)  # A GunKlass may be?
+        self.gun = Gun(self.vector)
 
     @property
     def vector(self) -> pygame.Vector2:

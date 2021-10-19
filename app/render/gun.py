@@ -1,25 +1,29 @@
 import pygame
 
+from app.game.state.mouse import MouseDescriptor
 from config import RENDER_DEBUG
 
 
 class GunRender:
-    def __init__(self, parent_surface, data):
+    mouse: pygame.Vector2 = MouseDescriptor()
+
+    def __init__(self, parent_surface, gun_data, player_position):
         self.surface = parent_surface
-        self.data = data
+        self.data = gun_data
+        self.player_position = player_position
 
     def update(self):
-        if RENDER_DEBUG:
-            self.__draw_aim_line()
-
-    def __draw_aim_line(self):
         pygame.draw.line(
             surface=self.surface,
             color=pygame.Color(200, 100, 0),
-            start_pos=self.data.vector,
+            start_pos=self.player_position,
             end_pos=self.data.vector
         )
 
+        if RENDER_DEBUG:
+            self.draw_debug()
+
+    def draw_debug(self):
         # vector Oz
         pygame.draw.line(
             surface=self.surface,
@@ -33,20 +37,20 @@ class GunRender:
             surface=self.surface,
             color=pygame.Color(0, 200, 0),
             start_pos=(0, 0),
-            end_pos=self.data.vector
+            end_pos=self.player_position
         )
         # vector OM
         pygame.draw.line(
             surface=self.surface,
-            color=pygame.Color(0, 200, 0),
+            color=pygame.Color(200, 0, 200),
             start_pos=(0, 0),
-            end_pos=self.data.mouse
+            end_pos=self.mouse
         )
 
         # aim line
         pygame.draw.line(
             surface=self.surface,
             color=pygame.Color(200, 0, 0),
-            start_pos=self.data.vector,
-            end_pos=self.data.mouse
+            start_pos=self.player_position,
+            end_pos=self.mouse
         )

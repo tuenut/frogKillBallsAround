@@ -12,7 +12,15 @@ class Game(ABCGame):
         self.logger.debug("Init Game...")
 
         self.state = GameStateController()
+
         self.events = EventManager()
+
+        self.events.subscribe(
+            event_type=pygame.MOUSEBUTTONDOWN,
+            callback=self.state.bullets.fire,
+            kwargs=["pos"],
+            as_args=True
+        )
 
     def update(self):
         self.state.update()

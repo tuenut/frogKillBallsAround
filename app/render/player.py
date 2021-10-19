@@ -12,7 +12,7 @@ class PlayerRender:
         self.surface = parent_surface
         self.data = player_data
 
-        self.gun = GunRender(self.surface, self.data.gun)
+        self.gun = GunRender(self.surface, self.data.gun, self.data.vector)
 
     def update(self):
         self.__draw_player()
