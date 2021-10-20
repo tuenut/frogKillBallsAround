@@ -24,9 +24,9 @@ class GameStateController(ABCGameStateController):
         self.player.update()
 
     @property
-    def player(self):
+    def player(self) -> Player:
         return self.__player
 
     @property
-    def bullets(self):
+    def bullets(self) -> BulletController:
         return self.__bullets

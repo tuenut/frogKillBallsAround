@@ -1,13 +1,28 @@
 import logging
-
 import pygame  # type: ignore
 
 from abstarct.app.render import ABCRender
 from app.constants import COLOR_RENDER_BG
+from app.game.state.bullets import BulletController
 
 from app.game.state.controller import GameStateController
 from app.render.player import PlayerRender
 from config import RENDER_DEBUG
+
+
+class BulletsRender:
+    def __init__(self, parent_surface: pygame.Surface, data: BulletController):
+        self.surface = parent_surface
+        self.data = data
+
+    def update(self):
+        for bullet in self.data:
+            pygame.draw.circle(
+                surface=self.surface,
+                color=bullet.color,
+                center=bullet.position,
+                radius=30
+            )
 
 
 class Render(ABCRender):
@@ -15,13 +30,11 @@ class Render(ABCRender):
         self.logger = logging.getLogger(__name__)
         self.logger.debug("Init Render...")
 
-        self.__text_prolonged = ""
-        self.__text_cursor = ""
-
         self.game_data = data
 
         self.width = width
         self.height = height
+
         self.screen = pygame.display.set_mode(
             (self.width, self.height),
             pygame.DOUBLEBUF
@@ -32,17 +45,23 @@ class Render(ABCRender):
         self.font = pygame.font.SysFont('mono', 12, bold=True)
 
         self.player = PlayerRender(self.surface, self.game_data.player)
+        self.bullets = BulletsRender(self.surface, data.bullets)
 
-    def __draw(self):
-        if RENDER_DEBUG:
-            self.__draw_cursor()
+    def update(self):
+        pygame.display.flip()
+        self.surface.fill(COLOR_RENDER_BG)
 
+        self.player.update()
+        self.bullets.update()
         self.screen.blit(self.surface, (0, 0))
 
         if RENDER_DEBUG:
-            self.__draw_cursor_text()
+            self.draw_debug()
 
-    def __draw_cursor(self):
+    text_prolonged = ""
+    text_cursor = ""
+
+    def draw_cursor(self):
         # y pos
         pygame.draw.line(
             surface=self.surface,
@@ -57,27 +76,25 @@ class Render(ABCRender):
             start_pos=(640, self.game_data.mouse.y),
             end_pos=(0, self.game_data.mouse.y)
         )
+        self.screen.blit(self.surface, (0, 0))
 
-    def __draw_cursor_text(self):
-        self.__text_cursor = \
+    def draw_cursor_text(self):
+        self.text_cursor = \
             f"{self.game_data.mouse} " \
             f"({self.game_data.mouse.length():.2f})"
-        self.__text_prolonged = \
+        self.text_prolonged = \
             f"{self.game_data.player.gun.vector} " \
             f"({self.game_data.player.gun.vector.length():.2f})"
 
         self.screen.blit(
-            self.font.render(self.__text_cursor, True, (255, 255, 255)),
+            self.font.render(self.text_cursor, True, (255, 255, 255)),
             pygame.Vector2(self.width - 160, self.height - 40)
         )
         self.screen.blit(
-            self.font.render(self.__text_prolonged, True, (255, 255, 255)),
+            self.font.render(self.text_prolonged, True, (255, 255, 255)),
             pygame.Vector2(self.width - 160, self.height - 20)
         )
 
-    def update(self):
-        pygame.display.flip()
-        self.surface.fill(COLOR_RENDER_BG)
-
-        self.player.update()
-        self.__draw()
+    def draw_debug(self):
+        self.draw_cursor()
+        self.draw_cursor_text()

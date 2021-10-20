@@ -1,12 +1,18 @@
 import logging
+import random
 
 import pygame
 
+from app.constants import FPS
+
 
 class Bullet:
+    SPEED = 30 / FPS  # px per update tick
+
     def __init__(self, start_pos, vector):
-        self.start_pos = self.pos = pygame.Vector2(start_pos)
+        self.start_pos = self.position = pygame.Vector2(start_pos)
         self.target_vector = vector
+        self.color = pygame.Color(*tuple(random.randint(100, 255) for i in range(3)))
 
     def update(self):
         # TODO calculate next position from current and target vector
@@ -29,3 +35,6 @@ class BulletController:
     def update(self):
         for bullet in self.fired_bullets:
             bullet.update()
+
+    def __iter__(self):
+        return iter(self.fired_bullets)
