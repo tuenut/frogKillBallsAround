@@ -40,42 +40,19 @@ class ShootingVector(ABCShotVector):
         TODO:  no restrictions, but should be limited with field edges.
         """
 
-        in_top_part = self.mouse.x >= 0 and self.mouse.y <= self.y_limit / 2
+        aim_radius_vector = pygame.Vector2(
+            self.mouse.x - self.player_position.x,
+            self.mouse.y - self.player_position.y
+        )
+        angle_to_ox = aim_radius_vector.angle_to(pygame.Vector2(1, 0))
+        angle_to_oy = aim_radius_vector.angle_to(pygame.Vector2(0, 1))
+        self.sin_to_OX = math.sin(math.radians(angle_to_ox + 90))
+        self.sin_to_OY = math.sin(math.radians(angle_to_oy + 90))
 
-        MC = self.mouse.distance_to(self.player_position)
-        MQ = abs(self.x_limit / 2 - self.mouse.x)
-        sin_MCQ = MQ / MC
-        cos_MCQ = math.sqrt(1 - sin_MCQ ** 2)
-
-        try:
-            if in_top_part:
-                ZM = self.mouse.y / cos_MCQ
-            else:
-                ZM = (self.y_limit - self.mouse.y) / cos_MCQ
-        except ZeroDivisionError:
-            if self.mouse.x <= self.x_limit / 2:
-                return pygame.Vector2(0, self.y_limit / 2)
-            else:
-                return pygame.Vector2(self.x_limit, self.y_limit / 2)
-
-        ZX = ZM * sin_MCQ
-
-        if self.mouse.x <= self.x_limit / 2:
-            if in_top_part:
-                x = self.mouse.x - ZX
-                y = 0
-            else:
-                x = self.mouse.x - ZX
-                y = self.y_limit
-        else:
-            if in_top_part:
-                x = self.mouse.x + ZX
-                y = 0
-            else:
-                x = self.mouse.x + ZX
-                y = self.y_limit
-
-        self.__vector = pygame.Vector2(x, y)
+        self.__vector = pygame.Vector2((
+            self.player_position.x + (640 - self.player_position.x) * self.sin_to_OX,
+            self.player_position.y + (640 - self.player_position.y) * self.sin_to_OY,
+        ))
 
     @property
     def vector(self):
@@ -84,7 +61,7 @@ class ShootingVector(ABCShotVector):
 
 class GunShootingVectorDEscriptor:
     def __get__(self, instance: Type[Gun], owner=None):
-        return instance._Gun__shooting_vector.vector
+        return instance.shooting_vector.vector
 
 
 class Gun:
@@ -93,7 +70,7 @@ class Gun:
     def __init__(self, player_position: pygame.Vector2):
         self.logger = logging.getLogger(__name__)
 
-        self.__shooting_vector = ShootingVector(player_position)
+        self.shooting_vector = ShootingVector(player_position)
 
     def update(self):
-        self.__shooting_vector.update()
+        self.shooting_vector.update()

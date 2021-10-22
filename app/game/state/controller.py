@@ -16,12 +16,13 @@ class GameStateController(ABCGameStateController):
 
         self.__mouse = Mouse()
         self.__player = Player()
-        self.__bullets = BulletController(self.__player.vector)
+        self.__bullets = BulletController(self.__player)
         self.__app_state = AppState()
 
     def update(self):
         self.__mouse.update()
         self.player.update()
+        self.bullets.update()
 
     @property
     def player(self) -> Player:

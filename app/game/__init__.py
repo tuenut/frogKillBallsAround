@@ -14,9 +14,9 @@ class Game(ABCGame):
         self.state = GameStateController()
         self.events = EventManager()
 
-        self.__subscribe_onevents()
+        self.__subscribe_on_events()
 
-    def __subscribe_onevents(self):
+    def __subscribe_on_events(self):
         self.events.subscribe(
             event_type=pygame.MOUSEBUTTONDOWN,
             callback=self.state.bullets.fire,
