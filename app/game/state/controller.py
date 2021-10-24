@@ -2,7 +2,7 @@ import logging
 import pygame
 
 from abstarct.game.state.controller import ABCGameStateController
-from app.game.state.bullets import BulletController
+from app.game.state.gun_controller import GunController
 from app.game.state.mouse import Mouse, MouseDescriptor
 from app.game.state.player import Player
 from app.state import AppState
@@ -16,18 +16,19 @@ class GameStateController(ABCGameStateController):
 
         self.__mouse = Mouse()
         self.__player = Player()
-        self.__bullets = BulletController(self.__player)
-        self.__app_state = AppState()
+        self._gun = GunController(self.__player)
+
+        self.__app_state = AppState()  # todo: ????
+
+    @property
+    def player(self) -> pygame.Vector2:
+        return self.__player.vector
+
+    @property
+    def bullets(self) -> list:
+        return self._gun.fired_bullets
 
     def update(self):
         self.__mouse.update()
-        self.player.update()
-        self.bullets.update()
-
-    @property
-    def player(self) -> Player:
-        return self.__player
-
-    @property
-    def bullets(self) -> BulletController:
-        return self.__bullets
+        self.__player.update()
+        self._gun.update()

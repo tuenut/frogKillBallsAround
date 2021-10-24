@@ -19,7 +19,7 @@ class Game(ABCGame):
     def __subscribe_on_events(self):
         self.events.subscribe(
             event_type=pygame.MOUSEBUTTONDOWN,
-            callback=self.state.bullets.fire,
+            callback=self.state._gun.fire,
             kwargs=["pos"],
             as_args=True
         )

@@ -3,7 +3,6 @@ import pygame  # type: ignore
 
 from abstarct.app.render import ABCRender
 from app.constants import COLOR_RENDER_BG
-from app.game.state.bullets import BulletController
 
 from app.game.state.controller import GameStateController
 from app.render.player import PlayerRender
@@ -11,16 +10,16 @@ from config import RENDER_DEBUG
 
 
 class BulletsRender:
-    def __init__(self, parent_surface: pygame.Surface, data: BulletController):
+    def __init__(self, parent_surface: pygame.Surface, data: GameStateController):
         self.surface = parent_surface
         self.data = data
 
     def update(self):
-        for bullet in self.data:
+        for bullet in self.data.bullets:
             pygame.draw.circle(
                 surface=self.surface,
                 color=bullet.color,
-                center=bullet.position,
+                center=bullet.vector,
                 radius=30
             )
 
@@ -45,7 +44,7 @@ class Render(ABCRender):
         self.font = pygame.font.SysFont('mono', 12, bold=True)
 
         self.player = PlayerRender(self.surface, self.game_data.player)
-        self.bullets = BulletsRender(self.surface, data.bullets)
+        self.bullets = BulletsRender(self.surface, self.game_data)
 
     def update(self):
         pygame.display.flip()
@@ -56,7 +55,7 @@ class Render(ABCRender):
         self.screen.blit(self.surface, (0, 0))
 
         if RENDER_DEBUG:
-            self.draw_debug()
+            self.draw_cursor()
 
     text_prolonged = ""
     text_cursor = ""
@@ -76,25 +75,20 @@ class Render(ABCRender):
             start_pos=(640, self.game_data.mouse.y),
             end_pos=(0, self.game_data.mouse.y)
         )
+        # mouse aim line
+        pygame.draw.line(
+            surface=self.surface,
+            color=pygame.Color(200, 0, 0),
+            start_pos=self.game_data.player,
+            end_pos=self.game_data.mouse
+        )
         self.screen.blit(self.surface, (0, 0))
 
-    def draw_cursor_text(self):
         self.text_cursor = \
             f"{self.game_data.mouse} " \
             f"({self.game_data.mouse.length():.2f})"
-        self.text_prolonged = \
-            f"{self.game_data.player.gun.vector} " \
-            f"({self.game_data.player.gun.vector.length():.2f})"
 
         self.screen.blit(
             self.font.render(self.text_cursor, True, (255, 255, 255)),
             pygame.Vector2(self.width - 160, self.height - 40)
         )
-        self.screen.blit(
-            self.font.render(self.text_prolonged, True, (255, 255, 255)),
-            pygame.Vector2(self.width - 160, self.height - 20)
-        )
-
-    def draw_debug(self):
-        self.draw_cursor()
-        self.draw_cursor_text()
