@@ -10,10 +10,12 @@ class EventManager:
     logger = logging.getLogger(__name__)
     logger.level = logging.INFO
 
+    __subscriptions: Dict[int, Dict[int, dict]]
+
     def __init__(self):
         self.logger.debug("Init events manager.")
 
-        self.__subscriptions: Dict[int: List[Dict]] = {}
+        self.__subscriptions = {}
         self.__events = []
 
     def check_events(self):
@@ -30,17 +32,17 @@ class EventManager:
         self.logger.debug("End of handling pygame events.")
 
     def on_event(self, event):
-        event_subscribtions = self.__subscriptions.get(event.type, [])
+        event_subscribtions = self.__subscriptions.get(event.type, {})
 
-        for subscribtion in event_subscribtions:
-            callback = subscribtion["callback"]
-            subtype = subscribtion["subtype"]
-            conditions = subscribtion["conditions"]
+        for subscription in list(event_subscribtions.values()):
+            callback = subscription["callback"]
+            subtype = subscription["subtype"]
+            conditions = subscription["conditions"]
 
             if self.check_conditions(event, conditions) \
                     and self.check_event_subtype(event, subtype):
-                kwargs = self.__get_kwargs(event, subscribtion["kwargs"])
-                if subscribtion["as_args"]:
+                kwargs = self.__get_kwargs(event, subscription["kwargs"])
+                if subscription["as_args"]:
                     callback(*kwargs.values())
                 else:
                     callback(**kwargs)
@@ -127,11 +129,20 @@ class EventManager:
             "as_args": as_args
         }
 
+        index = id(callback)
         try:
-            self.__subscriptions[event_type].append(subscription)
-        except KeyError:
-            self.__subscriptions[event_type] = [subscription, ]
+            if index in self.__subscriptions[event_type]:
+                raise Exception("Event already registered.")
 
-    def unsubscribe(self, event_type, callback):
-        # TODO !!!
-        ...
+            self.__subscriptions[event_type][index] = subscription
+        except KeyError:
+            self.__subscriptions[event_type] = {index: subscription, }
+
+        subscription_id = f"{str(event_type)}.{index}"
+
+        return subscription_id
+
+    def unsubscribe(self, subscription_id: str):
+        event_type, index = list(map(int, subscription_id.split(".")))
+        del self.__subscriptions[event_type][index]
+

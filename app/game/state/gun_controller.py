@@ -112,7 +112,7 @@ class GunController(ABCGunController):
         for idx, bullet in enumerate(self.fired_bullets):
             bullet.update()
 
-            if (bullet.vector.x > GAME_SETTINGS["resolution"][0] + 30) \
-                    or (bullet.vector.y > GAME_SETTINGS["resolution"][1] + 30):
+            if (bullet.vector.__x > GAME_SETTINGS["resolution"][0] + 30) \
+                    or (bullet.vector.__y > GAME_SETTINGS["resolution"][1] + 30):
                 self.fired_bullets.pop(idx)
                 del bullet
